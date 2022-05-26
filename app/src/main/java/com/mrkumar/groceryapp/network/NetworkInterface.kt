@@ -1,5 +1,6 @@
 package com.mrkumar.groceryapp.network
 
+import com.mrkumar.groceryapp.model.UserApiModel
 import com.mrkumar.groceryapp.model.UserModel
 import retrofit2.Call
 import retrofit2.Retrofit
@@ -7,12 +8,13 @@ import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
 
 interface NetworkInterface {
-    @GET("userdata")
+    @GET("posts")
     fun getUserData() : Call<List<UserModel>>
 
     companion object {
-
-        var BASE_URL = "https://crudcrud.com/api/63fcdf377c204df69e1314a7139ea9d7/"
+//      https://jsonplaceholder.typicode.com/posts
+        //https://crudcrud.com/api/63fcdf377c204df69e1314a7139ea9d7/
+        var BASE_URL = "https://jsonplaceholder.typicode.com/"
 
         fun create() : NetworkInterface {
 

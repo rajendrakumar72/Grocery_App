@@ -19,9 +19,9 @@ class UserAdapter(var list: List<UserModel>, val viewModel: MainActivityViewMode
 
         with(holder){
             with(list[position]){
-                binding.tvName.text=this.name
-                binding.tvEmail.text=this.email
-                binding.tvPhone.text=this.mobile
+                binding.tvName.text=this.id
+                binding.tvEmail.text=this.body
+                binding.tvPhone.text=this.title
             }
         }
     }

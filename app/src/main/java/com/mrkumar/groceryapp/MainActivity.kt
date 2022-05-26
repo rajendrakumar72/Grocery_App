@@ -5,9 +5,12 @@ import android.os.Bundle
 import android.util.Log
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.mrkumar.groceryapp.adapter.UserAdapter
 import com.mrkumar.groceryapp.databinding.ActivityMainBinding
+import com.mrkumar.groceryapp.model.UserApiModel
 import com.mrkumar.groceryapp.model.UserModel
 import com.mrkumar.groceryapp.network.NetworkInterface
 import com.mrkumar.groceryapp.repository.UserRepository
@@ -24,6 +27,7 @@ class MainActivity : AppCompatActivity() {
 
     lateinit var ViewModel: MainActivityViewModel
     lateinit var list: List<UserModel>
+    lateinit var userAdapter:UserAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,9 +40,21 @@ class MainActivity : AppCompatActivity() {
 
         // Initialised View Model
         ViewModel = ViewModelProvider(this, factory).get(MainActivityViewModel::class.java)
-        val userAdapter = UserAdapter(listOf(), ViewModel)
-        binding.rvList.layoutManager = LinearLayoutManager(this)
-        binding.rvList.adapter = userAdapter
+//        val userAdapter = UserAdapter(listOf(), ViewModel)
+//        binding.rvList.layoutManager = LinearLayoutManager(this)
+//        val divider = DividerItemDecoration(applicationContext, StaggeredGridLayoutManager.VERTICAL)
+//        addItemDecoration(divider)
+//        binding.rvList.adapter = userAdapter
+
+        binding.rvList.apply {
+            layoutManager = LinearLayoutManager(this@MainActivity)
+            userAdapter = UserAdapter(listOf(),ViewModel)
+            adapter = userAdapter
+            val divider = DividerItemDecoration(applicationContext,
+                StaggeredGridLayoutManager.VERTICAL)
+            addItemDecoration(divider)
+        }
+
 
 
         // To display all items in recycler view
@@ -49,14 +65,16 @@ class MainActivity : AppCompatActivity() {
 
         val apiInterface = NetworkInterface.create().getUserData()
 
-//        apiInterface.enqueue( Callback<List<User>>())
         apiInterface.enqueue( object : Callback<List<UserModel>> {
             override fun onResponse(call: Call<List<UserModel>>?, response: Response<List<UserModel>>?) {
 
                 if(response?.body() != null){
                     var arrayList=ArrayList(response.body())
                     Log.d("TAG", "onResponse: $arrayList")
-                    ViewModel.insert(response.body()!![0])
+                    for(i in arrayList.indices){
+                        ViewModel.insert(response.body()!![i])
+                    }
+
 
                 }
 //                    recyclerAdapter.setMovieListItems(response.body()!!)
