@@ -8,7 +8,7 @@ import androidx.room.RoomDatabase
 import com.mrkumar.groceryapp.dao.UserDao
 import com.mrkumar.groceryapp.model.UserModel
 
-@Database(entities = [UserModel::class], version = 1)
+@Database(entities = [UserModel::class], version = 2)
 abstract class UserRoomDB:RoomDatabase(){
     abstract fun getGroceryDao(): UserDao
 

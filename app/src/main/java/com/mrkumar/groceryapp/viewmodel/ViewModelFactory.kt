@@ -6,6 +6,6 @@ import com.mrkumar.groceryapp.repository.UserRepository
 
 class ViewModelFactory(private val repository: UserRepository):ViewModelProvider.NewInstanceFactory() {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return super.create(modelClass)
+        return MainActivityViewModel(repository) as T
     }
 }
