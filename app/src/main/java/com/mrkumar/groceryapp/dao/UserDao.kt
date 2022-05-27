@@ -21,4 +21,7 @@ interface UserDao {
     // all the data of database.
     @Query("SELECT * FROM userData")
     fun getAllUserData(): LiveData<List<UserModel>>
+
+    @Update
+    suspend fun update(item: UserModel)
 }

@@ -1,16 +1,24 @@
-package com.mrkumar.groceryapp
+package com.mrkumar.groceryapp.view
 
+import android.app.Dialog
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.text.TextUtils
 import android.util.Log
+import android.view.Window
+import android.view.WindowManager
+import android.widget.Button
+import android.widget.EditText
+import android.widget.Toast
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import com.mrkumar.groceryapp.R
 import com.mrkumar.groceryapp.adapter.UserAdapter
 import com.mrkumar.groceryapp.databinding.ActivityMainBinding
-import com.mrkumar.groceryapp.model.UserApiModel
+import com.mrkumar.groceryapp.databinding.DialogLayoutBinding
 import com.mrkumar.groceryapp.model.UserModel
 import com.mrkumar.groceryapp.network.NetworkInterface
 import com.mrkumar.groceryapp.repository.UserRepository
@@ -63,6 +71,7 @@ class MainActivity : AppCompatActivity() {
             userAdapter.notifyDataSetChanged()
         })
 
+        userAdapter.onItemClick={data->updateData(data)}
         val apiInterface = NetworkInterface.create().getUserData()
 
         apiInterface.enqueue( object : Callback<List<UserModel>> {
@@ -86,4 +95,52 @@ class MainActivity : AppCompatActivity() {
         })
 
     }
+
+    private fun updateData(data:UserModel) {
+        val dialog= Dialog(this)
+        val bnd:DialogLayoutBinding= DialogLayoutBinding.inflate(layoutInflater)
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setContentView(bnd.root)
+        dialog.setCancelable(true)
+
+        val layoutParams= WindowManager.LayoutParams()
+        layoutParams.copyFrom(dialog.window!!.attributes)
+        layoutParams.width= WindowManager.LayoutParams.MATCH_PARENT
+        layoutParams.height= WindowManager.LayoutParams.WRAP_CONTENT
+
+
+        val edtDesc:EditText=bnd.edtUpdateDesc
+        val edtTitle:EditText= bnd.edtUpdateTitle
+
+        edtTitle.setText(data.title)
+        edtDesc.setText(data.body)
+
+        dialog.findViewById<Button>(R.id.btnUpdateCancel).setOnClickListener {
+            dialog.dismiss()
+        }
+
+        bnd.btnUpdate.setOnClickListener {
+            if (inputCheck(edtTitle.text.toString(),edtDesc.text.toString())){
+                val notes=UserModel(data.courseID,data.userId,data.id,edtTitle.text.toString(),edtDesc.text.toString())
+                ViewModel.updateData(notes)
+
+                Toast.makeText(this,"Updated Successfully",
+                    Toast.LENGTH_SHORT).show()
+                dialog.dismiss()
+            }else{
+                Toast.makeText(this,"Please Enter All Field",
+                    Toast.LENGTH_SHORT).show()
+            }
+        }
+
+
+        dialog.show()
+        dialog.window!!.attributes=layoutParams
+    }
+
+    //Check input from edittext
+    private fun inputCheck(tittle: String, desc: String):Boolean{
+        return !(TextUtils.isEmpty(tittle)&& TextUtils.isEmpty(desc))
+    }
+
 }
