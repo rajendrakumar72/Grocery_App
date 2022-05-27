@@ -36,7 +36,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
 
-    lateinit var ViewModel: MainActivityViewModel
+    lateinit var _viewModel: MainActivityViewModel
     lateinit var list: List<UserModel>
     lateinit var userAdapter:UserAdapter
 
@@ -50,12 +50,12 @@ class MainActivity : AppCompatActivity() {
         val factory = ViewModelFactory(groceryRepository)
 
         // Initialised View Model
-        ViewModel = ViewModelProvider(this, factory).get(MainActivityViewModel::class.java)
+        _viewModel = ViewModelProvider(this, factory).get(MainActivityViewModel::class.java)
 
         //recyclerview1
         binding.rvList.apply {
             layoutManager = LinearLayoutManager(this@MainActivity)
-            userAdapter = UserAdapter(listOf(),ViewModel)
+            userAdapter = UserAdapter(listOf(),_viewModel)
             adapter = userAdapter
             val divider = DividerItemDecoration(applicationContext,
                 StaggeredGridLayoutManager.VERTICAL)
@@ -63,7 +63,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         // To display all items in recycler view
-        ViewModel.allGroceryItems().observe(this, Observer {
+        _viewModel.allGroceryItems().observe(this, Observer {
             userAdapter.list = it
             userAdapter.notifyDataSetChanged()
         })
@@ -98,7 +98,7 @@ class MainActivity : AppCompatActivity() {
         bnd.btnUpdate.setOnClickListener {
             if (inputCheck(edtTitle.text.toString(),edtDesc.text.toString())){
                 val notes=UserModel(data.courseID,data.userId,data.id,edtTitle.text.toString(),edtDesc.text.toString())
-                ViewModel.updateData(notes)
+                _viewModel.updateData(notes)
 
                 Toast.makeText(this,"Updated Successfully",
                     Toast.LENGTH_SHORT).show()
@@ -129,7 +129,7 @@ class MainActivity : AppCompatActivity() {
                     val builder= AlertDialog.Builder(this)
                     builder.setTitle("Are You sure You Want Delete All Data?")
                     builder.setPositiveButton("Yes"){_,_->
-                        ViewModel.deleteAll()
+                        _viewModel.deleteAll()
                         Toast.makeText(this,"Deleted",
                             Toast.LENGTH_SHORT).show()
                     }
@@ -148,12 +148,12 @@ class MainActivity : AppCompatActivity() {
                     override fun onResponse(call: Call<List<UserModel>>?, response: Response<List<UserModel>>?) {
 
                         if (response!!.code() == 200) {
-                            ViewModel.deleteAll()
+                            _viewModel.deleteAll()
                             if (response.body() != null) {
                                 val arrayList = response.body()?.let { ArrayList(it) }
                                 Log.d("TAG", "onResponse: $arrayList")
                                 for (i in arrayList!!.indices) {
-                                    ViewModel.insert(response.body()!![i])
+                                    _viewModel.insert(response.body()!![i])
                                 }
                             }
                         }
