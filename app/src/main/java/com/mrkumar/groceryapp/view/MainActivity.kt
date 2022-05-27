@@ -51,12 +51,8 @@ class MainActivity : AppCompatActivity() {
 
         // Initialised View Model
         ViewModel = ViewModelProvider(this, factory).get(MainActivityViewModel::class.java)
-//        val userAdapter = UserAdapter(listOf(), ViewModel)
-//        binding.rvList.layoutManager = LinearLayoutManager(this)
-//        val divider = DividerItemDecoration(applicationContext, StaggeredGridLayoutManager.VERTICAL)
-//        addItemDecoration(divider)
-//        binding.rvList.adapter = userAdapter
 
+        //recyclerview1
         binding.rvList.apply {
             layoutManager = LinearLayoutManager(this@MainActivity)
             userAdapter = UserAdapter(listOf(),ViewModel)
@@ -66,8 +62,6 @@ class MainActivity : AppCompatActivity() {
             addItemDecoration(divider)
         }
 
-
-
         // To display all items in recycler view
         ViewModel.allGroceryItems().observe(this, Observer {
             userAdapter.list = it
@@ -75,27 +69,6 @@ class MainActivity : AppCompatActivity() {
         })
 
         userAdapter.onItemClick={data->updateData(data)}
-        val apiInterface = NetworkInterface.create().getUserData()
-
-        apiInterface.enqueue( object : Callback<List<UserModel>> {
-            override fun onResponse(call: Call<List<UserModel>>?, response: Response<List<UserModel>>?) {
-
-                if(response?.body() != null){
-                    var arrayList=ArrayList(response.body())
-                    Log.d("TAG", "onResponse: $arrayList")
-                    for(i in arrayList.indices){
-                        ViewModel.insert(response.body()!![i])
-                    }
-
-
-                }
-//                    recyclerAdapter.setMovieListItems(response.body()!!)
-            }
-
-            override fun onFailure(call: Call<List<UserModel>>?, t: Throwable?) {
-                Log.e("TAG", "onFailure: ${t.toString()}" )
-            }
-        })
 
     }
 
@@ -154,7 +127,7 @@ class MainActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
                 if (item.itemId==R.id.deleteMenu){
                     val builder= AlertDialog.Builder(this)
-                    builder.setTitle("Are You sure You Want Delete All Notes?")
+                    builder.setTitle("Are You sure You Want Delete All Data?")
                     builder.setPositiveButton("Yes"){_,_->
                         ViewModel.deleteAll()
                         Toast.makeText(this,"Deleted",
@@ -166,6 +139,39 @@ class MainActivity : AppCompatActivity() {
                     }
                     builder.create().show()
                 }
+            if(item.itemId==R.id.refreshMenu){
+            val builder=AlertDialog.Builder(this)
+            builder.setTitle("Are You sure You Want Refresh Data?")
+            builder.setPositiveButton("Yes"){_,_ ->
+                val apiInterface = NetworkInterface.create().getUserData()
+                apiInterface.enqueue( object : Callback<List<UserModel>> {
+                    override fun onResponse(call: Call<List<UserModel>>?, response: Response<List<UserModel>>?) {
+
+                        if (response!!.code() == 200) {
+                            ViewModel.deleteAll()
+                            if (response.body() != null) {
+                                val arrayList = response.body()?.let { ArrayList(it) }
+                                Log.d("TAG", "onResponse: $arrayList")
+                                for (i in arrayList!!.indices) {
+                                    ViewModel.insert(response.body()!![i])
+                                }
+                            }
+                        }
+                    }
+
+                    override fun onFailure(call: Call<List<UserModel>>?, t: Throwable?) {
+                        Log.e("TAG", "onFailure: ${t.toString()}" )
+                    }
+                })
+
+                Toast.makeText(this,"Refreshed",
+                    Toast.LENGTH_SHORT).show()
+            }
+            builder.setNegativeButton("No") { _, _ ->
+
+            }
+            builder.create().show()
+        }
         return super.onOptionsItemSelected(item)
     }
 
