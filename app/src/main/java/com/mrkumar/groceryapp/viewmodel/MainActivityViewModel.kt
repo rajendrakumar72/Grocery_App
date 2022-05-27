@@ -29,4 +29,11 @@ class MainActivityViewModel(private val repository: UserRepository):ViewModel() 
         }
     }
 
+    //delete All
+    fun deleteAll(){
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.deleteAll()
+        }
+    }
+
 }

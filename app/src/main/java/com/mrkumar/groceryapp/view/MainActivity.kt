@@ -5,11 +5,14 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.TextUtils
 import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
 import android.view.Window
 import android.view.WindowManager
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -141,6 +144,29 @@ class MainActivity : AppCompatActivity() {
     //Check input from edittext
     private fun inputCheck(tittle: String, desc: String):Boolean{
         return !(TextUtils.isEmpty(tittle)&& TextUtils.isEmpty(desc))
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.main_menu,menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+                if (item.itemId==R.id.deleteMenu){
+                    val builder= AlertDialog.Builder(this)
+                    builder.setTitle("Are You sure You Want Delete All Notes?")
+                    builder.setPositiveButton("Yes"){_,_->
+                        ViewModel.deleteAll()
+                        Toast.makeText(this,"Deleted",
+                            Toast.LENGTH_SHORT).show()
+                    }
+
+                    builder.setNegativeButton("No") { _, _ ->
+
+                    }
+                    builder.create().show()
+                }
+        return super.onOptionsItemSelected(item)
     }
 
 }

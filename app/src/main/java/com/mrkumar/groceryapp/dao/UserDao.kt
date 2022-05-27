@@ -24,4 +24,7 @@ interface UserDao {
 
     @Update
     suspend fun update(item: UserModel)
+
+    @Query("DELETE FROM userData")
+    suspend fun deleteAll()
 }
